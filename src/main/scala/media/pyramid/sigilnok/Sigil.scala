@@ -21,7 +21,7 @@ case class NameUpdate(name: String) extends QRCodeUpdate
 case class UpdateMsg(alpha: String, bgColor: String, fgColor: String, name: String, payload: String, size: String)
 
 object Sigil {
-  val version: String = "0.2"
+  val version: String = "0.2.1"
   val defaultPayload: String = document.getElementById("SIGIL-CORE")
     .asInstanceOf[dom.html.Element].dataset.get("defaultpayload").get
   val apiEndpoint: String = document.getElementById("SIGIL-CORE")
@@ -80,7 +80,7 @@ object Sigil {
       val z: () => Any = {()=>
         buttonText.set(buttonDefault)
       }
-      window.setInterval(z, 3500)
+      window.setTimeout(z, 3500)
     })
 
     button(
@@ -101,7 +101,7 @@ object Sigil {
     top := "0",
     div(
       cls := "row",
-      h2("Sigil [Jab's simple QR Code Generator]")
+      h2(s"Sigil [Jab's simple QR Code Generator]")
     ),
     div(
       cls := "row",
