@@ -3,9 +3,11 @@ package media.pyramid.sigilnok
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.keys.EventProcessor
 import org.scalajs.dom
-import org.scalajs.dom.document
+import org.scalajs.dom.{document, window}
 import org.scalajs.dom.ext.KeyCode
 import org.scalajs.dom.raw.KeyboardEvent
+
+import scala.scalajs.js.Any
 
 
 trait QRCodeUpdate
@@ -63,10 +65,39 @@ object Sigil {
     x.startsWith("#") && x.length == 7
   }
 
+  val copyButton: Button = {
+    val clickBus = new EventBus[dom.MouseEvent]
+    val clickStream: EventStream[String] = clickBus.events.map(x => "")
+    val buttonDefault = "Copy to Clipboard"
+    val buttonTextCopied = "url copied!!"
+    val buttonText: Var[String] = Var(buttonDefault)
+
+    val observer = Observer[String](onNext = { x =>
+      val code = document.getElementById("code-img")
+      window.navigator.clipboard.writeText(code.getAttribute("src"))
+
+      buttonText.set(buttonTextCopied)
+      val z: () => Any = {()=>
+        buttonText.set(buttonDefault)
+      }
+      window.setInterval(z, 3500)
+    })
+
+    button(
+      marginTop := "10px",
+      cls := "button",
+      strong(
+        child.text <-- buttonText,
+      ),
+      onClick --> clickBus,
+      clickStream --> observer
+    )
+  }
+
   val sigilAppDiv: Div = div(
     cls := "container",
     position := "absolute",
-    left := "0",
+    left := "10px",
     top := "0",
     div(
       cls := "row",
@@ -206,6 +237,7 @@ object Sigil {
         )
       )
     ),
+    copyButton,
     div(
       cls := "row",
       img(
